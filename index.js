@@ -39,8 +39,8 @@ app.use(
   }),
 );
 
-const proxyConf={ "/": "start.valenceromansmobilites.fr", "/www": "www.valenceromansmobilites.fr", "/boutique": "boutique.valenceromansmobilites.fr"}
-
+//const proxyConf={ "/": "start.valenceromansmobilites.fr", "/www": "www.valenceromansmobilites.fr", "/boutique": "boutique.valenceromansmobilites.fr"}
+const proxyConf={ "/": "salons.externe.mobireport.fr/" }
 
 for (const [target, origin] of Object.entries(proxyConf)) {
 app.use(
@@ -48,11 +48,20 @@ app.use(
   createProxyMiddleware({
     target: "https://"+origin,
     changeOrigin: true,
-    pathFilter: ["!/client/*", "!/pdf/*","!/www/*", "!/boutique/*"],
+    pathFilter: ["!/client/*", "!/pdf/*"],
     selfHandleResponse: true,
-    secure: false,
+    //secure: false,
     logger: console,
     on: {
+      proxyReq:(proxyReq, req, res) => {
+        console.log(`On Proxy Request ${proxyReq}`);
+        proxyReq.setHeader('Host', 'salons.externe.mobireport.fr');
+        proxyReq.setHeader('user-agent', 'curl/7.81.0');
+        proxyReq.setHeader('accept', '*/*');
+        //proxyReq.setHeader('Accept-Encoding', 'gzip, deflate, br');
+        //proxyReq.setHeader('Connection', 'keep-alive');
+
+      },
       proxyRes: responseInterceptor(
         async (responseBuffer, proxyRes, req, res) => {
           
